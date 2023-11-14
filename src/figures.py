@@ -158,13 +158,8 @@ def PlotLine(x,y,figsize=(8,8),colors=color_scheme_2_1,ax=None,
 	if return_fig:
 		return fig
 
-def PlotContour(x_grid,y_grid,c_values,figsize=(8,8),ax=None,colors=[],cmap='viridis',
+def PlotContour(x_grid,y_grid,c_values,figsize=(8,8),ax=None,cmap=ReturnColorMap('viridis'),
 	contourf_kwargs={},contour_kwargs={},axes_kwargs={},colorbar_kwargs={},grid_kwargs={}):
-	
-	if colors:
-		cmap=LinearSegmentedColormap.from_list('custom', colors, N=256)
-	else:
-		cmap=plt.get_cmap(cmap)
 
 	return_fig=False
 	if ax is None:

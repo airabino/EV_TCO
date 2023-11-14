@@ -13,9 +13,15 @@ class Vehicle():
 	Stores vehicle parameters and contains functions to compute TCO and other costs
 	'''
 
-	def __init__(self,params):
+	def __init__(self,params,inputs={}):
 
 		self.params=params
+
+		for key,val in inputs.items():
+
+			self.params[key]=val
+
+		# print(self.params['all_electric_range'])
 
 		self.Populate()
 
@@ -312,12 +318,16 @@ class Vehicle():
 			self.params['usable_battery_capacity']/
 			self.params['battery_swing_efficiency'])
 
+		# print(self.params['usable_battery_capacity'],self.params['battery_capacity'])
+
 		#Utility factor
 		self.params['utility_factor']=interp1d(
 			self.params['interpolation_all_electric_range'],
 			self.params['interpolation_utility_factor'],
 			fill_value='extrapolate')(
 			self.params['all_electric_range'])
+
+		# print(self.params['utility_factor'])
 
 		# Component cost constants
 		self.params['c_0']={
