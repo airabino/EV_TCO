@@ -6,18 +6,29 @@ All units are SI base units (mgs) unless otherwise specified
 
 import numpy as np
 
-inputs={
-	'model_year':2025, #[model_year]
-	'long_itinerary_choice':'charge', #['charge','replace']
-	'electric_range':200*1e3, #[m]
-	'annual_distance':13250*1609, #[m]
-	'ownership_duration':10, #[years]
-	'override_utility_factor':0, #[-]
-	'override_battery_capacity':0, #[J]
-	'override_powertrain_rated_power':0, #[J]
-	'override_engine_power':0, #[J]
-	'override_motor_power':0, #[J]
-}
+import src
+
+def LoadDefaults(inputs={}):
+
+    models={}
+
+    models['icev_sedan']=src.cost.Vehicle(parameters_icev_sedan,inputs)
+    models['icev_cuv']=src.cost.Vehicle(parameters_icev_cuv,inputs)
+    models['icev_suv']=src.cost.Vehicle(parameters_icev_suv,inputs)
+
+    models['hev_sedan']=src.cost.Vehicle(parameters_hev_sedan,inputs)
+    models['hev_cuv']=src.cost.Vehicle(parameters_hev_cuv,inputs)
+    models['hev_suv']=src.cost.Vehicle(parameters_hev_suv,inputs)
+
+    models['phev_sedan']=src.cost.Vehicle(parameters_phev_sedan,inputs)
+    models['phev_cuv']=src.cost.Vehicle(parameters_phev_cuv,inputs)
+    models['phev_suv']=src.cost.Vehicle(parameters_phev_suv,inputs)
+
+    models['bev_sedan']=src.cost.Vehicle(parameters_bev_sedan,inputs)
+    models['bev_cuv']=src.cost.Vehicle(parameters_bev_cuv,inputs)
+    models['bev_suv']=src.cost.Vehicle(parameters_bev_suv,inputs)
+    
+    return models
 
 # Default AER and UF as a function of AER
 all_electric_range=np.linspace(0,500,51)*1e3
@@ -316,7 +327,7 @@ parameters_phev_sedan={
 	'powertrain_rated_power':150.*1e3, # [W]
 	'consumption_combustion':1/(60/33.7*1.609)*3600, # [J/m]
 	'consumption_electric':0.30*3.6e3/1.609, # [J/m]
-	'all_electric_range':40e3, # [m]
+	'all_electric_range':30e3, # [m]
 	'chassis_cost':12700*1.06, # [$]
 	'auxiliary_cost_multiplier':0.4, # [-]
 	'oem_profit_margin':0.05, # [-]
@@ -352,7 +363,7 @@ parameters_phev_cuv={
 	'powertrain_rated_power':150.*1e3, # [W]
 	'consumption_combustion':1/(55/33.7*1.609)*3600, # [J/m]
 	'consumption_electric':0.355*3.6e3/1.609, # [J/m]
-	'all_electric_range':40e3, # [m]
+	'all_electric_range':30e3, # [m]
 	'chassis_cost':12700*1.05, # [$]
 	'auxiliary_cost_multiplier':0.4, # [-]
 	'oem_profit_margin':0.1, # [-]
@@ -388,7 +399,7 @@ parameters_phev_suv={
 	'powertrain_rated_power':220.*1e3, # [W]
 	'consumption_combustion':1/(50/33.7*1.609)*3600, # [J/m]
 	'consumption_electric':0.51*3.6e3/1.609, # [J/m]
-	'all_electric_range':40e3, # [m]
+	'all_electric_range':30e3, # [m]
 	'chassis_cost':12700*1.21, # [$]
 	'auxiliary_cost_multiplier':0.4, # [-]
 	'oem_profit_margin':0.15, # [-]
@@ -424,7 +435,7 @@ parameters_bev_sedan={
 	'powertrain_rated_power':150.*1e3, # [W]
 	'consumption_combustion':1/(60/33.7*1.609)*3600, # [J/m]
 	'consumption_electric':0.29*3.6e3/1.609, # [J/m]
-	'all_electric_range':300e3, # [m]
+	'all_electric_range':400e3, # [m]
 	'chassis_cost':12700*1.06, # [$]
 	'auxiliary_cost_multiplier':0.4, # [-]
 	'oem_profit_margin':0.05, # [-]
@@ -460,7 +471,7 @@ parameters_bev_cuv={
 	'powertrain_rated_power':150.*1e3, # [W]
 	'consumption_combustion':1/(55/33.7*1.609)*3600, # [J/m]
 	'consumption_electric':0.345*3.6e3/1.609, # [J/m]
-	'all_electric_range':300e3, # [m]
+	'all_electric_range':400e3, # [m]
 	'chassis_cost':12700*1.05, # [$]
 	'auxiliary_cost_multiplier':0.4, # [-]
 	'oem_profit_margin':0.1, # [-]
@@ -496,7 +507,7 @@ parameters_bev_suv={
 	'powertrain_rated_power':220.*1e3, # [W]
 	'consumption_combustion':1/(50/33.7*1.609)*3600, # [J/m]
 	'consumption_electric':0.49*3.6e3/1.609, # [J/m]
-	'all_electric_range':300e3, # [m]
+	'all_electric_range':400e3, # [m]
 	'chassis_cost':12700*1.21, # [$]
 	'auxiliary_cost_multiplier':0.4, # [-]
 	'oem_profit_margin':0.15, # [-]

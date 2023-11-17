@@ -8,6 +8,44 @@ from scipy.interpolate import interp1d
 
 from .utilities import ProgressBar,FullFact
 
+def InputsFactorial(models,inputs,outputs,disp=True,freq=100):
+	'''
+	Run a factorial on levels of inputs and return outputs for each combination and model
+	models - list of Vehicle objects
+	inputs - dict
+	outputs - list
+	'''
+
+	#Creating outputs dict and initializing with zero arrays
+	input_dimensions=[len(val) for val in inputs.values()]
+	outputs=[{field:np.zeros(input_dimensions) for field in outputs} for model in models]
+
+	#Reformatting the inputs
+	input_fields=[key for key in inputs.keys()]
+	levels=FullFact(input_dimensions).astype(int)
+
+	#Running the cases
+	for idx in ProgressBar(range(len(levels)),disp=disp,freq=freq):
+
+		#Getting active case
+		case=(
+			[inputs[input_fields[idx_f]][levels[idx,idx_f]] for \
+			idx_f in range(len(input_fields))])
+
+		#Applying the case for each vehicle
+		for idx_m,model in enumerate(models):
+
+			case_dict={input_fields[idx_c]:case[idx_c] for idx_c in range(len(case))}
+
+			model(case_dict)
+
+			#Getting the desired outputs
+			for key in outputs[0].keys():
+
+				outputs[idx_m][key][*levels[idx]]=model.costs[key]
+
+	return outputs
+
 class Vehicle():
 	'''
 	Stores vehicle parameters and contains functions to compute TCO and other costs
@@ -21,7 +59,13 @@ class Vehicle():
 
 			self.params[key]=val
 
-		# print(self.params['all_electric_range'])
+		self.Populate()
+
+	def __call__(self,inputs={}):
+
+		for key,val in inputs.items():
+
+			self.params[key]=val
 
 		self.Populate()
 
@@ -278,7 +322,7 @@ class Vehicle():
 			self.costs['transmission']=0
 
 	def Battery(self):
-
+		
 		reference_cost=(
 			self.params['battery']['reference_cost']*
 			self.params['battery']['annual_decline_factor']**
@@ -306,28 +350,29 @@ class Vehicle():
 		and component cost constants
 		'''
 
-		# Energy Consmuption
-
-
 		# Battery capacity
-		self.params['usable_battery_capacity']=(
-			self.params['all_electric_range']*
-			self.params['consumption_electric'])
+		if self.params['motor_power_portion']>0:
 
-		self.params['battery_capacity']=(
-			self.params['usable_battery_capacity']/
-			self.params['battery_swing_efficiency'])
+			self.params['usable_battery_capacity']=(
+				self.params['all_electric_range']*
+				self.params['consumption_electric'])
 
-		# print(self.params['usable_battery_capacity'],self.params['battery_capacity'])
+			self.params['battery_capacity']=(
+				self.params['usable_battery_capacity']/
+				self.params['battery_swing_efficiency'])
 
-		#Utility factor
-		self.params['utility_factor']=interp1d(
-			self.params['interpolation_all_electric_range'],
-			self.params['interpolation_utility_factor'],
-			fill_value='extrapolate')(
-			self.params['all_electric_range'])
+			#Utility factor
+			self.params['utility_factor']=interp1d(
+				self.params['interpolation_all_electric_range'],
+				self.params['interpolation_utility_factor'],
+				fill_value='extrapolate')(
+				self.params['all_electric_range'])
 
-		# print(self.params['utility_factor'])
+		else:
+
+			self.params['usable_battery_capacity']=0
+			self.params['battery_capacity']=0
+			self.params['utility_factor']=0
 
 		# Component cost constants
 		self.params['c_0']={

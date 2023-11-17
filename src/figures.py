@@ -58,6 +58,7 @@ colors={
 	'blues':["#1e1f26","#283655","#4d648d","#d0e1f9"],
 	'dusk':["#363237","#2d4262","#73605b","#d09683"],
 	'ice':["#1995ad","#a1d6e2","#bcbabe","#f1f1f2"],
+	'ibm':['#648fff','#785ef0','#dc267f','#fe6100','#ffb000'],
 	'2_0':["#21f0b6","#2a6866"],
 	'2_1':["#72e5ef","#3a427d"],
 	'2_2':["#6f309f","#dfccfa"],
@@ -89,9 +90,10 @@ def ReturnColorMap(colors):
 	return cmap
 
 def PlotStackedBar(data_dict,figsize=(8,8),cmap=ReturnColorMap('viridis'),ax=None,
-	bar_kwargs={},axes_kwargs={},legend_kwargs={},grid_kwargs={}):
+	bar_kwargs={},axes_kwargs={},legend_kwargs={},grid_kwargs={},legend_pad=0):
 
 	keys=list(data_dict.keys())
+	legend_keys=[key.ljust(legend_pad) for key in keys]
 	
 	positions=np.arange(0,len(data_dict[keys[0]]))
 
@@ -110,7 +112,7 @@ def PlotStackedBar(data_dict,figsize=(8,8),cmap=ReturnColorMap('viridis'),ax=Non
 		bottom+=values
 		handles.append(b)
 
-	ax.legend(handles[::-1],keys[::-1],**legend_kwargs)
+	ax.legend(handles[::-1],legend_keys[::-1],**legend_kwargs)
 
 	ax.set(**axes_kwargs)
 
